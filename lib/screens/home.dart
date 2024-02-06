@@ -14,6 +14,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final todosList = ToDo.todoList();
+  List<ToDo> _foundToDo = [];
+  final _todoController = TextEditingController();
+
+  @override
+  void iniState() {
+    _foundToDo = todosList;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +48,11 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                       ),
-                      for (ToDo todoo in todosList)
+                      for (ToDo todoo in _foundToDo)
                         ToDoItem(
                           todo: todoo,
                           onToDoChange: _handleToDoChange,
-                          onDeleteItem: () {},
+                          onDeleteItem: _deleteTodoItem,
                         ),
                     ],
                   ),
@@ -56,31 +64,32 @@ class _HomeState extends State<Home> {
             alignment: Alignment.bottomCenter,
             child: Row(children: [
               Expanded(
-                  child: Container(
-                margin: EdgeInsets.only(
-                  bottom: 20,
-                  right: 20,
-                  left: 20,
-                ),
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.grey,
-                        offset: Offset(0.0, 0.0),
-                        blurRadius: 10.0,
-                        spreadRadius: 0.0,
-                      ),
-                    ],
-                    borderRadius: BorderRadius.circular(10)),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Add a new to do Item',
-                    border: InputBorder.none,
+                child: Container(
+                  margin: EdgeInsets.only(
+                    bottom: 20,
+                    right: 20,
+                    left: 20,
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.grey,
+                          offset: Offset(0.0, 0.0),
+                          blurRadius: 10.0,
+                          spreadRadius: 0.0,
+                        ),
+                      ],
+                      borderRadius: BorderRadius.circular(10)),
+                  child: TextField(
+                    controller: _todoController,
+                    decoration: InputDecoration(
+                      hintText: 'Add a new to do Item',
+                      border: InputBorder.none,
+                    ),
                   ),
                 ),
-              ),
               ),
               Container(
                 margin: EdgeInsets.only(
@@ -94,7 +103,9 @@ class _HomeState extends State<Home> {
                       fontSize: 40,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    _addToDoItem(_todoController.text);
+                  },
                   style: ElevatedButton.styleFrom(
                     primary: tdBlue,
                     // minimumSize: Size(60, 60),
@@ -118,6 +129,31 @@ class _HomeState extends State<Home> {
   void _deleteTodoItem(String id) {
     setState(() {
       todosList.removeWhere((item) => item.id == id);
+    });
+  }
+
+  void _addToDoItem(String toDo) {
+    setState(() {
+      todosList.add(ToDo(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          todoText: toDo));
+    });
+    _todoController.clear();
+  }
+
+  void _runFilter(String enterKeyword) {
+    List<ToDo> results = [];
+    if (enterKeyword.isEmpty) {
+      results = todosList;
+    } else {
+      results = todosList
+          .where((item) =>
+              item.todoText!.toLowerCase().contains(enterKeyword.toLowerCase()))
+          .toList();
+    }
+
+    setState(() {
+      _foundToDo = results;
     });
   }
 
