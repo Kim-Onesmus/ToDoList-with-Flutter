@@ -26,6 +26,20 @@ class ToDoItem extends StatelessWidget {
           decoration: TextDecoration.lineThrough,
           ),
       ),
+      trailing: Container(
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color: tdRed,
+          borderRadius: BorderRadius.circular(5)
+        ),
+        child: IconButton(
+          color: Colors.white,
+          iconSize: 18,
+          icon: Icon(Icons.delete),
+          onPressed: () {},
+        ),
+      ),
     ));
   }
 }
